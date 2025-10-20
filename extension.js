@@ -37,7 +37,7 @@ class Extension extends PanelMenu.Button{
         super._init(0);
 
        // Label  voir les style at https://docs.gtk.org/Pango/pango_markup.html
-        label = new St.Label({style_class: 'pingindic-label',y_align: Clutter.ActorAlign.CENTER,text: _("¡HOLA!")});
+        label = new St.Label({style_class: 'pingindic-label',y_align: Clutter.ActorAlign.CENTER,text: _("Measuring ping...")});
         let topBox = new St.BoxLayout();
         topBox.add_actor(label);
 
@@ -96,10 +96,8 @@ class Extension extends PanelMenu.Button{
             GLib.SpawnFlags.SEARCH_PATH, 
             null);
 
-        GLib.close(this.std_in);
-        
         if (!success) {
-            label.set_text(_("Ping Fail"));  //xxx for debug
+            log('launching ping fail');
             return;
         }
 
@@ -119,9 +117,8 @@ class Extension extends PanelMenu.Button{
              out = channel.read_line();
             const result =  out[1].split('=');
             if(result[3] != null) {
-                const val=result[3].split('\n');
-                label.set_text(val[0]);
-                setlabelstyle(val[0]); 
+                label.set_text(result[3]);
+                setlabelstyle(result[3]);
             }
         }
         else {
@@ -130,7 +127,6 @@ class Extension extends PanelMenu.Button{
         }
         GLib.source_remove(tagWatchOUT);
         channel.shutdown(true);
-        //GLib.spawn_close_pid(pid);
     }
 
     loadPipeERR(channel, condition, data) {
@@ -140,7 +136,6 @@ class Extension extends PanelMenu.Button{
         }
         GLib.source_remove(tagWatchERR);
         channel.shutdown(false);
-        //GLib.spawn_close_pid(pid);
     }
 });
 
